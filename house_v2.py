@@ -64,7 +64,7 @@ def createCubeFaces(faces, idx):
     faces.append(( idx+3, idx, idx+4, idx+7 )) #4,1,5,8
     faces.append(( idx+4, idx+5, idx+6, idx+7 ))#5,6,7,8
 
-##################### TOWER DACH GENERIEREN ##########################################
+##################### TOWER DACH GENERIEREN ###########################################
 def createTowerRoof(name, pX,pY, height, width):
     mesh = bpy.data.meshes.new("mesh")
     topCoords = []
