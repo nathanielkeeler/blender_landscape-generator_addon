@@ -34,9 +34,9 @@ PI = math.pi
 def createTowerBase(name, pX,pY, height, width):
     bpy.ops.mesh.primitive_cube_add(size=1, location=(pX+width/2, pY+width/2, height/2), scale=(width*2, width*2, height*2),rotation = (0,0,0))
 
-def createHouseBase(name, pX,pY, height, width,rot):
-    bpy.ops.mesh.primitive_cube_add(size=1, location=(pX+width/2, pY+width/2, height/2), scale=(width*2, width*2, height*2),rotation = (0,0,rot))
-    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1, depth=1, location=(pX+width/2, pY+width/2, height+(height/4)), scale=(width*1.155, (height*2)/2, width*2), rotation = (PI/2 ,0,PI/2+rot ))
+def createHouseBase(name, pX,pY, height, width,length,rot):
+    bpy.ops.mesh.primitive_cube_add(size=1, location=(pX+width/2, pY+width/2, height/2), scale=(length*2, width*2, height*2),rotation = (0,0,rot))
+    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1, depth=1, location=(pX+width/2, pY+width/2, height+(height/4)), scale=(width*1.155, (height*2)/2, length*2), rotation = (PI/2 ,0,PI/2+rot ))
       
 ##################### TOWER Roof###########################################
 def createTowerRoof(name, pX,pY, height, width):
@@ -99,13 +99,13 @@ def createTowerRoofFaces(faces, idx):
     faces.append(( idx+12, idx+13, idx+14, idx+15 ))
 
 ##################### House Roof ##########################################
-def createHouseRoof(name, pX,pY, height, width,rot):
-    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1, depth=1, location=(pX+width/2, pY+width/2, height+(height/4)), scale=(width*1.155, (height*2)/2, width*2), rotation = (PI/2 ,0,PI/2+rot))
+def createHouseRoof(name, pX,pY, height, width,length,rot):
+    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1, depth=1, location=(pX+width/2, pY+width/2, height+(height/4)), scale=(width*1.155, (height*2)/2, length*2), rotation = (PI/2 ,0,PI/2+rot))
     bpy.ops.transform.resize(value=(1.2,1.2,1.2))
     roof1=bpy.context.object
       
     
-    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1, depth=1, location=(pX+width/2, pY+width/2, height+(height/4)-0.03), scale=(width*1.155, (height*2)/2, width*2.9), rotation = (PI/2 ,0,PI/2+rot))
+    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1, depth=1, location=(pX+width/2, pY+width/2, height+(height/4)-0.03), scale=(width*1.155, (height*2)/2, length*2.9), rotation = (PI/2 ,0,PI/2+rot))
     roof2=bpy.context.object
     bpy.context.object.display_type = 'WIRE' 
     
@@ -141,10 +141,11 @@ def createHouse(posX,posY):
     rInt = randint(0,3)
     rot = rotation[rInt]
     
-    width = random.uniform(0.5,0.8)
+    width = random.uniform(0.5,0.7)
+    length = random.uniform(0.6,0.8)
     height = (width * 2)/3
-    createHouseBase("House Base", posX, posY, height, width,rot)
-    createHouseRoof('Top of House', posX,posY, height, width,rot)
+    createHouseBase("House Base", posX, posY, height, width,length,rot)
+    createHouseRoof('Top of House', posX,posY, height, width,length,rot)
     
 
 generate_town()
