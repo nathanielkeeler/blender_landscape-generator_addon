@@ -11,6 +11,7 @@ bpy.ops.object.delete(use_global=False, confirm=False) # löscht selektierte obj
 bpy.ops.outliner.orphans_purge() # löscht überbleibende Meshdaten etc.
 
 
+
 def generate_town():
     for row in range(5):
         for column in range(5):
@@ -19,52 +20,26 @@ def generate_town():
             randomInt = randint(0,7)
                                 
             if randomInt == 0:
-                    createBigTower(positionX, positionY)	
+                    createTower(positionX, positionY)	
             elif randomInt >= 1 and randomInt < 5:
-                    createSmallHouse(positionX, positionY)
+                    createHouse(positionX, positionY)
             elif randomInt >=5:
-                    createGreenTrash(positionX, positionY)
+                    createGreens(positionX, positionY)
         
                     
-                    
+PI = math.pi
+print(PI)                    
 
 
 #####################Cube erstellen ##########################################
-def createBaseCube(name, pX,pY, height, width):
-    mesh = bpy.data.meshes.new("building")
-    coords = []
-    faces = []
-    pZ = 0
-    idx = 0
-    
-    createCubeVertices(coords,pX,pY, pZ,height,width)
-    createCubeFaces(faces,idx)
+def createTowerBase(name, pX,pY, height, width):
+    bpy.ops.mesh.primitive_cube_add(size=1, location=(pX+width/2, pY+width/2, height/2), scale=(width*2, width*2, height*2),rotation = (0,0,0))
 
-    building_object = bpy.data.objects.new(name, mesh)
-
-    bpy.context.collection.objects.link(building_object)
-    mesh.from_pydata(coords, [], faces)
-    mesh.update( calc_edges=True )
+def createHouseBase(name, pX,pY, height, width):
+    bpy.ops.mesh.primitive_cube_add(size=1, location=(pX+width/2, pY+width/2, height/2), scale=(width*2, width*2, height*2),rotation = (0,0,0))
+    bpy.ops.mesh.primitive_cylinder_add(vertices=3, radius=1, depth=1, location=(pX+width/2, pY+width/2, height+(height/4)), scale=(width*1.155, (height*2)/2, width*2), rotation = (PI/2 ,0,PI/2 ))
       
-def createCubeVertices(coords,px, py, pz, height, width):
-    coords.append(( px, py, pz )) #1
-    coords.append(( px + width, py, pz )) #2
-    coords.append(( px + width, py + width, pz )) #3
-    coords.append(( px, py+width , pz ))#4
-    coords.append(( px, py, pz + height))#5
-    coords.append(( px + width, py, pz + height))#6
-    coords.append(( px + width, py + width, pz + height))#7
-    coords.append(( px, py+width , pz + height))#8
-
-def createCubeFaces(faces, idx):
-    faces.append(( idx, idx+1, idx+2, idx+3 )) #unten
-    faces.append(( idx, idx+1, idx+5, idx+4 )) #1,2,6,5 links
-    faces.append(( idx+1, idx+2, idx+6, idx+5 )) #2,3,7,6 vorne
-    faces.append(( idx+2, idx+3, idx+7, idx+6 )) #3,4,8,7 rechts
-    faces.append(( idx+3, idx, idx+4, idx+7 )) #4,1,5,8
-    faces.append(( idx+4, idx+5, idx+6, idx+7 ))#5,6,7,8
-
-##################### TOWER DACH GENERIEREN ###########################################
+##################### TOWER Roof###########################################
 def createTowerRoof(name, pX,pY, height, width):
     mesh = bpy.data.meshes.new("mesh")
     topCoords = []
@@ -123,24 +98,8 @@ def createTowerRoofFaces(faces, idx):
     faces.append(( idx+15, idx+12, idx+8, idx+11 ))
     
     faces.append(( idx+12, idx+13, idx+14, idx+15 ))
-##################### DACHBODEN##########################################
-def createHouseAttic(name, pX,pY, height, width):
-    mesh = bpy.data.meshes.new("mesh")
-    topCoords = []
-    topFaces = []
-    pZ = height
-    idx = 0
-    roof_height = height/1.2
-    
-    atticVertices(topCoords ,pX, pY, pZ, height, width,roof_height)
-    atticFaces(topFaces, idx)
 
-    top_object = bpy.data.objects.new(name, mesh)
-
-    bpy.context.collection.objects.link(top_object)
-    mesh.from_pydata(topCoords, [], topFaces)
-    mesh.update( calc_edges=True )
-##################### HÄUSER DACH GENERIEREN ##########################################
+##################### House Roof ##########################################
 def createHouseRoof(name, pX,pY, height, width):
     mesh = bpy.data.meshes.new("mesh")
     topCoords = []
@@ -152,29 +111,13 @@ def createHouseRoof(name, pX,pY, height, width):
     createHouseRoofVertices(topCoords,pX,pY,pZ, height, width,roof_height)
     createHouseRoofFaces(topFaces, idx)
     
-
-
     top_object = bpy.data.objects.new(name, mesh)
 
     bpy.context.collection.objects.link(top_object)
     mesh.from_pydata(topCoords, [], topFaces)
     mesh.update( calc_edges=True )
     
-def atticVertices(coords ,px, py, pz, height, width,roof_height):
-    coords.append(( px, py, pz )) #1
-    coords.append(( px + width, py, pz )) #2
-    coords.append(( px + width, py + width, pz )) #3
-    coords.append(( px, py+width , pz ))#4
-    
-    coords.append(( px + width , py+(width/2), pz+(roof_height)  ))
-    coords.append(( px , py + (width/2), pz+roof_height ))
-    
-def atticFaces(faces, idx):
-    faces.append(( idx, idx+3, idx+5))
-    faces.append(( idx + 1, idx+4, idx+2))
-
 def createHouseRoofVertices(coords ,px, py, pz, height, width,roof_height):
-    
     coords.append(( px - (roof_height/10), py - (roof_height/10), pz - (roof_height/10)))#1
     coords.append(( px + width + (roof_height/10), py - (roof_height/10), pz - (roof_height/10) )) #2
     coords.append(( px + width + (roof_height/10), py + width + (roof_height/10), pz - (roof_height/10))) #3
@@ -190,7 +133,6 @@ def createHouseRoofVertices(coords ,px, py, pz, height, width,roof_height):
     coords.append(( px + width + (roof_height/10), py+(width/2), pz+(roof_height) - (roof_height/10)  ))
     coords.append(( px - (roof_height/10), py + (width/2), pz+roof_height - (roof_height/10)))
     coords.append(( px + width + (roof_height/10), py+(width/2) , pz+roof_height ))
-    
     
 def createHouseRoofFaces(faces, idx):
     faces.append(( idx, idx+1, idx+5, idx+4 ))
@@ -208,7 +150,7 @@ def createHouseRoofFaces(faces, idx):
     
 
     
-def createGreenTrash(posX, posY):
+def createGreens(posX, posY):
     
     for row in range(3):
         for column in range(3):
@@ -224,25 +166,25 @@ def createGreenTrash(posX, posY):
     
 
 
-def createBigTower(posX, posY):
+def createTower(posX, posY):
 
     #Würfel erstellen
     width = random.uniform(0.5,0.8)
     height = width * 3
-    createBaseCube("Big Tower", posX, posY, height, width)
+    createTowerBase("Tower", posX, posY, height, width)
 
     #Dach erstellen
-    createTowerRoof('Top of BigTower', posX,posY, height, width)
+    createTowerRoof('Top of Tower', posX,posY, height, width)
     
-def createSmallHouse(posX,posY):
+def createHouse(posX,posY):
     #Würfel erstellen
     width = random.uniform(0.5,0.8)
     height = (width * 2)/3
-    createBaseCube("SmallHouse", posX, posY, height, width)
+    createHouseBase("House Base", posX, posY, height, width)
     #Dachboden
-    createHouseAttic("Attic of small House",posX,posY, height, width)
+    #createHouseAttic("Attic of small House",posX,posY, height, width)
     #Dach erstellen
-    createHouseRoof('Top of small House', posX,posY, height, width)
+    createHouseRoof('Top of House', posX,posY, height, width)
     
 
 generate_town()
