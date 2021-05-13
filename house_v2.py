@@ -82,47 +82,47 @@ def createTowerRoof(name, pX,pY, height, width):
     mesh.from_pydata(topCoords, [], topFaces)
     mesh.update( calc_edges=True )
 
-def createTowerRoofVertices(topB_coords ,px, py, pz, height, width,roof_height):
-    topB_coords.append(( px, py, pz ))
-    topB_coords.append(( px + width, py, pz ))
-    topB_coords.append(( px + width, py + width, pz ))
-    topB_coords.append(( px, py+width , pz ))
+def createTowerRoofVertices(coords ,px, py, pz, height, width,roof_height):
+    coords.append(( px, py, pz ))
+    coords.append(( px + width, py, pz ))
+    coords.append(( px + width, py + width, pz ))
+    coords.append(( px, py+width , pz ))
     
-    topB_coords.append(( px, py, pz + roof_height))
-    topB_coords.append(( px + width, py, pz + roof_height))
-    topB_coords.append(( px + width, py + width, pz + roof_height))
-    topB_coords.append(( px, py+width , pz + roof_height))
+    coords.append(( px, py, pz + roof_height))
+    coords.append(( px + width, py, pz + roof_height))
+    coords.append(( px + width, py + width, pz + roof_height))
+    coords.append(( px, py+width , pz + roof_height))
     
     
-    topB_coords.append(( px+(roof_height/4), py+(roof_height/4), pz +roof_height))
-    topB_coords.append(( px + width-(roof_height/4), py+(roof_height/4), pz+roof_height))
-    topB_coords.append(( px + width-(roof_height/4), py + width-(roof_height/4), pz+roof_height))
-    topB_coords.append(( px+(roof_height/4), py+width -(roof_height/4), pz+roof_height ))
+    coords.append(( px+(roof_height/4), py+(roof_height/4), pz +roof_height))
+    coords.append(( px + width-(roof_height/4), py+(roof_height/4), pz+roof_height))
+    coords.append(( px + width-(roof_height/4), py + width-(roof_height/4), pz+roof_height))
+    coords.append(( px+(roof_height/4), py+width -(roof_height/4), pz+roof_height ))
     
-    topB_coords.append(( px +(roof_height/4), py+(roof_height/4), pz + (roof_height/2)))
-    topB_coords.append(( px + width-(roof_height/4), py+(roof_height/4), pz + (roof_height/2)))
-    topB_coords.append(( px + width-(roof_height/4), py + width-(roof_height/4), pz + (roof_height/2)))
-    topB_coords.append(( px+(roof_height/4), py+width -(roof_height/4), pz + (roof_height/2)))
+    coords.append(( px +(roof_height/4), py+(roof_height/4), pz + (roof_height/2)))
+    coords.append(( px + width-(roof_height/4), py+(roof_height/4), pz + (roof_height/2)))
+    coords.append(( px + width-(roof_height/4), py + width-(roof_height/4), pz + (roof_height/2)))
+    coords.append(( px+(roof_height/4), py+width -(roof_height/4), pz + (roof_height/2)))
     
-def createTowerRoofFaces(topB_faces, idx):
-    topB_faces.append(( idx, idx+1, idx+2, idx+3 ))
+def createTowerRoofFaces(faces, idx):
+    faces.append(( idx, idx+1, idx+2, idx+3 ))
     
-    topB_faces.append(( idx, idx+1, idx+5, idx+4 ))
-    topB_faces.append(( idx+1, idx+2, idx+6, idx+5 ))
-    topB_faces.append(( idx+2, idx+3, idx+7, idx+6 ))
-    topB_faces.append(( idx+3, idx, idx+4, idx+7 ))
+    faces.append(( idx, idx+1, idx+5, idx+4 ))
+    faces.append(( idx+1, idx+2, idx+6, idx+5 ))
+    faces.append(( idx+2, idx+3, idx+7, idx+6 ))
+    faces.append(( idx+3, idx, idx+4, idx+7 ))
     
-    topB_faces.append(( idx+4, idx+5, idx+9, idx+8 ))
-    topB_faces.append(( idx+5, idx+6, idx+10, idx+9 ))
-    topB_faces.append(( idx+6, idx+7, idx+11, idx+10 ))
-    topB_faces.append(( idx+7, idx+4, idx+8, idx+11 ))
+    faces.append(( idx+4, idx+5, idx+9, idx+8 ))
+    faces.append(( idx+5, idx+6, idx+10, idx+9 ))
+    faces.append(( idx+6, idx+7, idx+11, idx+10 ))
+    faces.append(( idx+7, idx+4, idx+8, idx+11 ))
     
-    topB_faces.append(( idx+12, idx+13, idx+9, idx+8 ))
-    topB_faces.append(( idx+13, idx+14, idx+10, idx+9 ))
-    topB_faces.append(( idx+14, idx+15, idx+11, idx+10 ))
-    topB_faces.append(( idx+15, idx+12, idx+8, idx+11 ))
+    faces.append(( idx+12, idx+13, idx+9, idx+8 ))
+    faces.append(( idx+13, idx+14, idx+10, idx+9 ))
+    faces.append(( idx+14, idx+15, idx+11, idx+10 ))
+    faces.append(( idx+15, idx+12, idx+8, idx+11 ))
     
-    topB_faces.append(( idx+12, idx+13, idx+14, idx+15 ))
+    faces.append(( idx+12, idx+13, idx+14, idx+15 ))
 ##################### DACHBODEN##########################################
 def createHouseAttic(name, pX,pY, height, width):
     mesh = bpy.data.meshes.new("mesh")
@@ -169,42 +169,42 @@ def atticVertices(coords ,px, py, pz, height, width,roof_height):
     coords.append(( px + width , py+(width/2), pz+(roof_height)  ))
     coords.append(( px , py + (width/2), pz+roof_height ))
     
-def atticFaces(topB_faces, idx):
-    topB_faces.append(( idx, idx+3, idx+5))
-    topB_faces.append(( idx + 1, idx+4, idx+2))
+def atticFaces(faces, idx):
+    faces.append(( idx, idx+3, idx+5))
+    faces.append(( idx + 1, idx+4, idx+2))
 
-def createHouseRoofVertices(topB_coords ,px, py, pz, height, width,roof_height):
+def createHouseRoofVertices(coords ,px, py, pz, height, width,roof_height):
     
-    topB_coords.append(( px - (roof_height/10), py - (roof_height/10), pz - (roof_height/10)))#1
-    topB_coords.append(( px + width + (roof_height/10), py - (roof_height/10), pz - (roof_height/10) )) #2
-    topB_coords.append(( px + width + (roof_height/10), py + width + (roof_height/10), pz - (roof_height/10))) #3
-    topB_coords.append(( px - (roof_height/10), py+width + (roof_height/10) , pz - (roof_height/10) )) #4
+    coords.append(( px - (roof_height/10), py - (roof_height/10), pz - (roof_height/10)))#1
+    coords.append(( px + width + (roof_height/10), py - (roof_height/10), pz - (roof_height/10) )) #2
+    coords.append(( px + width + (roof_height/10), py + width + (roof_height/10), pz - (roof_height/10))) #3
+    coords.append(( px - (roof_height/10), py+width + (roof_height/10) , pz - (roof_height/10) )) #4
     
-    topB_coords.append(( px - (roof_height/10), py - (roof_height/10), pz + (roof_height/10) - (roof_height/10)))#5
-    topB_coords.append(( px + width + (roof_height/10), py - (roof_height/10), pz + (roof_height/10) - (roof_height/10)))#6
-    topB_coords.append(( px + width + (roof_height/10), py + width + (roof_height/10), pz + (roof_height/10) - (roof_height/10)))#7
-    topB_coords.append(( px - (roof_height/10), py+width + (roof_height/10) , pz + (roof_height/10)- (roof_height/10) ))#8
-    
-    
-    topB_coords.append(( px - (roof_height/10), py+(width/2), pz +roof_height))
-    topB_coords.append(( px + width + (roof_height/10), py+(width/2), pz+(roof_height) - (roof_height/10)  ))
-    topB_coords.append(( px - (roof_height/10), py + (width/2), pz+roof_height - (roof_height/10)))
-    topB_coords.append(( px + width + (roof_height/10), py+(width/2) , pz+roof_height ))
+    coords.append(( px - (roof_height/10), py - (roof_height/10), pz + (roof_height/10) - (roof_height/10)))#5
+    coords.append(( px + width + (roof_height/10), py - (roof_height/10), pz + (roof_height/10) - (roof_height/10)))#6
+    coords.append(( px + width + (roof_height/10), py + width + (roof_height/10), pz + (roof_height/10) - (roof_height/10)))#7
+    coords.append(( px - (roof_height/10), py+width + (roof_height/10) , pz + (roof_height/10)- (roof_height/10) ))#8
     
     
-def createHouseRoofFaces(topB_faces, idx):
-    topB_faces.append(( idx, idx+1, idx+5, idx+4 ))
-    topB_faces.append(( idx + 2, idx+3, idx+7, idx+6 ))
-    topB_faces.append(( idx+4,idx+5,idx+11,idx+8))
-    topB_faces.append(( idx,idx+1,idx+9,idx+10))
-    topB_faces.append(( idx+1, idx+5, idx+11, idx+9 ))
-    topB_faces.append(( idx , idx+4, idx+8, idx+10 ))
+    coords.append(( px - (roof_height/10), py+(width/2), pz +roof_height))
+    coords.append(( px + width + (roof_height/10), py+(width/2), pz+(roof_height) - (roof_height/10)  ))
+    coords.append(( px - (roof_height/10), py + (width/2), pz+roof_height - (roof_height/10)))
+    coords.append(( px + width + (roof_height/10), py+(width/2) , pz+roof_height ))
+    
+    
+def createHouseRoofFaces(faces, idx):
+    faces.append(( idx, idx+1, idx+5, idx+4 ))
+    faces.append(( idx + 2, idx+3, idx+7, idx+6 ))
+    faces.append(( idx+4,idx+5,idx+11,idx+8))
+    faces.append(( idx,idx+1,idx+9,idx+10))
+    faces.append(( idx+1, idx+5, idx+11, idx+9 ))
+    faces.append(( idx , idx+4, idx+8, idx+10 ))
 
-    topB_faces.append(( idx+2,idx+6,idx+7,idx+3))
-    topB_faces.append(( idx+2,idx+9,idx+10,idx+3))
-    topB_faces.append(( idx+2,idx+9,idx+11,idx+6))
-    topB_faces.append(( idx+3,idx+10,idx+8,idx+7))
-    topB_faces.append(( idx+6, idx+11, idx+8, idx+7 ))
+    faces.append(( idx+2,idx+6,idx+7,idx+3))
+    faces.append(( idx+2,idx+9,idx+10,idx+3))
+    faces.append(( idx+2,idx+9,idx+11,idx+6))
+    faces.append(( idx+3,idx+10,idx+8,idx+7))
+    faces.append(( idx+6, idx+11, idx+8, idx+7 ))
     
 
     
