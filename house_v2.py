@@ -10,11 +10,15 @@ bpy.ops.object.select_all(action='SELECT') # selektiert alle Objekte
 bpy.ops.object.delete(use_global=False, confirm=False) # löscht selektierte objekte
 bpy.ops.outliner.orphans_purge() # löscht überbleibende Meshdaten etc.
 
+### Variables
+MAP_SIZE_X = 5
+MAP_SIZE_Y = 5
 
+# bpy.context.active_object.rotation_euler[2] = math.radians(90 * random.randint(0,3))
 
 def generate_town():
-    for row in range(5):
-        for column in range(5):
+    for row in range(MAP_SIZE_X):
+        for column in range(MAP_SIZE_Y):
             positionX = 1 * row
             positionY = 1 * column 
             randomInt = randint(0,7)
@@ -151,16 +155,19 @@ def createHouseRoofFaces(faces, idx):
 
     
 def createGreens(posX, posY):
+
+    max = random.randint(1,3)
+    TREE_DENSITY = random.randint(1,max)
     
-    for row in range(3):
-        for column in range(3):
+    for row in range(TREE_DENSITY):
+        for column in range(TREE_DENSITY):
             #Baumstamm
-            bpy.ops.mesh.primitive_cube_add(size=0.1, location=(0.3 * row + 0.5+(posX - 0.3) ,0.3 * column + 0.5+(posY - 0.3), 0.22), scale=(1, 1, 9))
+            bpy.ops.mesh.primitive_cube_add(size=0.1, location=(0.3 * row + 0.5+(posX - 0.3), 0.3 * column + 0.5+(posY - 0.3), 0.22), scale=(1, 1, 9))
             object_color = (0.102474, 0.0215169, 0.00329, 1)
             bpy.context.object.color = object_color
           
             #Baumkrone
-            bpy.ops.mesh.primitive_cube_add(size=0.2, location=(0.3 * row + 0.5 +(posX - 0.3) ,0.3 * column + 0.5+ (posY - 0.3), 0.3), scale=(1, 1, 4))
+            bpy.ops.mesh.primitive_cube_add(size=0.2, location=(0.3 * row + 0.5 +(posX - 0.3), 0.3 * column + 0.5+ (posY - 0.3), 0.3), scale=(1, 1, 4))
             object_color = (0.0106683, 0.147314, 0.0176817, 1)
             bpy.context.object.color = object_color    
     
