@@ -1,3 +1,14 @@
+bl_info = {
+    "name": "Landscape generator",
+    "author": "Maren Röttele, Niclas Cravaack, Nathaniel Keeler",
+    "version": (1, 0),
+    "blender": (2, 92, 0),
+    "location": "View3D > Add > Generate landscape",
+    "description": "Adds a randomly generated landscape to the scene with customizable parameters.",
+    "doc_url": "https://github.com/nathanielkeeler/Umgebungsgenerator",
+    "category": "Add Mesh",
+}
+
 import bpy
 import bmesh
 import math
@@ -9,17 +20,35 @@ class OBJECT_OT_generate_landscape(bpy.types.Operator):
     """Adds a randomly generated landscape to the scene with customizable parameters."""
     bl_idname = "object.generate_landscape"
     bl_label = "Generate landscape"
+    bl_description = "Adds a randomly generated landscape to the scene"
+    bl_options = {"REGISTER", "UNDO"}
 
-    ### Variables
-    MAP_SIZE_X: int = 5
-    MAP_SIZE_Y: int = 5
+    ### Customizable Variables
+    #Map size
+    MAP_SIZE: bpy.props.IntProperty(
+        name = "Map size",
+        description = "Changes map size in square proportion.",
+        min = 3,
+        max = 8,
+        default = 5
+    )
+    #Vegetation
+    TREE_DENSITY: bpy.props.IntProperty(
+        name = "Tree number",
+        description = "Changes number of trees per square.",
+        min = 1,
+        max = 3,
+        default = random.randint(1, random.randint(1,3))
+    )
+
+    ### Fixed variables
     PI = math.pi
 
     def execute(self, context):
         self.clearScene()
 
-        for row in range(self.MAP_SIZE_X):
-            for column in range(self.MAP_SIZE_Y):
+        for row in range(self.MAP_SIZE):
+            for column in range(self.MAP_SIZE):
                 positionX = 1 * row
                 positionY = 1 * column 
                 randomInt = randint(0,7)
@@ -155,12 +184,9 @@ class OBJECT_OT_generate_landscape(bpy.types.Operator):
 
         
     def createGreens(self, posX, posY):
-
-        max = random.randint(1,3)
-        TREE_DENSITY = random.randint(1,max)
         
-        for row in range(TREE_DENSITY):
-            for column in range(TREE_DENSITY):
+        for row in range(self.TREE_DENSITY):
+            for column in range(self.TREE_DENSITY):
                 #Baumstamm
                 bpy.ops.mesh.primitive_cube_add(size=0.1, location=(0.3 * row + 0.5+(posX - 0.3), 0.3 * column + 0.5+(posY - 0.3), 0.22), scale=(1, 1, 9))
                 object_color = (0.102474, 0.0215169, 0.00329, 1)
@@ -199,12 +225,17 @@ class OBJECT_OT_generate_landscape(bpy.types.Operator):
         bpy.ops.object.delete(use_global=False, confirm=False) # löscht selektierte objekte
         bpy.ops.outliner.orphans_purge() # löscht überbleibende Meshdaten etc.
 
+
+def menu_func(self, context):
+    self.layout.operator(OBJECT_OT_generate_landscape.bl_idname, icon="OUTLINER_OB_IMAGE")
+
 def register():
     bpy.utils.register_class(OBJECT_OT_generate_landscape)
-
+    bpy.types.VIEW3D_MT_add.append(menu_func)
 
 def unregister():
     bpy.utils.unregister_class(OBJECT_OT_generate_landscape)
+    bpy.types.VIEW3D_MT_add.remove(menu_func)
 
 if __name__ == "__main__":
     register()
