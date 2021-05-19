@@ -1,0 +1,14 @@
+CGTrader: https://www.cgtrader.com/free-3d-models?file_types%5B%5D=21&low_poly=1&page=1
+
+Vegetation:
+	- https://www.cgtrader.com/free-3d-models/plant/other/low-poly-trees-d9e99730-93d6-4564-a477-7ec52a990a3c
+	- https://www.cgtrader.com/free-3d-models/plant/other/forest-assets-low-poly-including-bonus-animal
+	
+Gebäude:
+	- https://www.cgtrader.com/free-3d-models/exterior/house/old-british-house
+	- https://www.cgtrader.com/free-3d-models/exterior/cityscape/full-building-1
+	- https://www.cgtrader.com/free-3d-models/exterior/cityscape/city-blocks-free
+	- https://www.cgtrader.com/free-3d-models/exterior/house/old-house-2--2
+	- https://www.cgtrader.com/free-3d-models/exterior/house/house-town
+	- https://www.cgtrader.com/free-3d-models/exterior/office/free-office-building
+	- https://www.cgtrader.com/free-3d-models/exterior/house/residental-building-town-house
