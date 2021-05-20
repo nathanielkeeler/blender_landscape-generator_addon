@@ -14,8 +14,6 @@ bpy.ops.outliner.orphans_purge() # löscht überbleibende Meshdaten etc.
 MAP_SIZE_X = 5
 MAP_SIZE_Y = 5
 
-# bpy.context.active_object.rotation_euler[2] = math.radians(90 * random.randint(0,3))
-
 def generate_town():
     for row in range(MAP_SIZE_X):
         for column in range(MAP_SIZE_Y):
