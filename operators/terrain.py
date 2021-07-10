@@ -12,14 +12,13 @@ class terrain():
 
     # Delete world nodes
     world_nodes = bpy.data.worlds['World'].node_tree
-
     for currentNode in world_nodes.nodes:
         world_nodes.nodes.remove(currentNode)
 
     def generate_terrain(self):
         bpy.context.scene.render.engine = 'CYCLES'
 
-        bpy.ops.mesh.primitive_plane_add(size=(6))
+        bpy.ops.mesh.primitive_plane_add(size=(20))
         plane = bpy.context.object
 
         mod_terrain = plane.modifiers.new("t_subsurf", "SUBSURF")
@@ -32,47 +31,61 @@ class terrain():
 
         mat_terrain.use_nodes = True
 
-        # Create and access nodes
-        nodes_terrain: typing.List[bpy.types.Node] = mat_terrain.node_tree.nodes
-
-        node_terrain_type: bpy.types.Node = nodes_terrain.new("ShaderNodeTexNoise")
-        node_terrain_type.location = Vector((-350, 200))
-
-        node_terrain_displace: bpy.types.Node = nodes_terrain.new("ShaderNodeDisplacement")
-        node_terrain_displace.location = Vector((130, 200))
-
-        node_color_ramp: bpy.types.Node = nodes_terrain.new("ShaderNodeValToRGB")
-        node_color_ramp.location = Vector((-150, 200))
-
-        node_pbsdf: bpy.types.Node =  nodes_terrain["Principled BSDF"]
-        node_pbsdf.location = Vector((-650, 300))
-
-        node_output: bpy.types.Node =  nodes_terrain["Material Output"]
-
         # Variables
-        scale = random.uniform(2, 3)
+        scale = random.uniform(1.5, 2.5)
         distortion = random.uniform(-1, 1)
         detail = 7.5
         detail_roughness = 0.3
+        displace_scale = random.uniform(1, 3)
+        random_noise = random.uniform(0.1, 1)
+        color_ramp_black = random.uniform(0.3, 0.4)
+        color_ramp_white = random.uniform(0.5, 0.6)
 
-        # Modify node values
+        # Create and access nodes
+        nodes_terrain: typing.List[bpy.types.Node] = mat_terrain.node_tree.nodes
+        
+        node_output: bpy.types.Node =  nodes_terrain["Material Output"]
+
+        #
+        node_terrain_displace: bpy.types.Node = nodes_terrain.new("ShaderNodeDisplacement")
+        node_terrain_displace.location = Vector((130, 200))
+        node_terrain_displace.inputs[2].default_value = displace_scale
+
+        #
+        node_color_ramp: bpy.types.Node = nodes_terrain.new("ShaderNodeValToRGB")
+        node_color_ramp.location = Vector((-150, 200))
+        node_color_ramp.color_ramp.interpolation = 'EASE'
+        node_color_ramp.color_ramp.elements[0].position = color_ramp_black
+        node_color_ramp.color_ramp.elements[1].position = color_ramp_white
+
+        #
+        node_terrain_type: bpy.types.Node = nodes_terrain.new("ShaderNodeTexNoise")
+        node_terrain_type.location = Vector((-350, 200))
         node_terrain_type.inputs[2].default_value = scale
         node_terrain_type.inputs[3].default_value = detail
         node_terrain_type.inputs[4].default_value = detail_roughness
         node_terrain_type.inputs[5].default_value = distortion
 
-        displace_scale = random.uniform(0.3, 0.4)
+        #
+        node_map: bpy.types.Node = nodes_terrain.new("ShaderNodeMapping")
+        node_map.location = Vector((-550, 200))
+        node_map.inputs[1].default_value[1] = random_noise
 
-        node_terrain_displace.inputs[2].default_value = displace_scale
-
-        bpy.data.materials["t_material"].node_tree.nodes["ColorRamp"].color_ramp.elements[0].position = random.uniform(0.4, 0.5)
-        bpy.data.materials["t_material"].node_tree.nodes["ColorRamp"].color_ramp.elements[1].position = random.uniform(0.5, 0.6)
+        #
+        node_tex_coord: bpy.types.Node = nodes_terrain.new("ShaderNodeTexCoord")
+        node_tex_coord.location = Vector((-720, 200))
+        
+        #
+        node_pbsdf: bpy.types.Node =  nodes_terrain["Principled BSDF"]
+        node_pbsdf.location = Vector((-1000, 300))
 
         # Combine nodes
-        mat_terrain.node_tree.links.new(node_pbsdf.outputs[0], node_output.inputs[0])
-        mat_terrain.node_tree.links.new(node_terrain_type.outputs[1], node_color_ramp.inputs[0])
-        mat_terrain.node_tree.links.new(node_color_ramp.outputs[0], node_terrain_displace.inputs[0])
         mat_terrain.node_tree.links.new(node_terrain_displace.outputs[0], node_output.inputs[2])
+        mat_terrain.node_tree.links.new(node_color_ramp.outputs[0], node_terrain_displace.inputs[0])
+        mat_terrain.node_tree.links.new(node_terrain_type.outputs[1], node_color_ramp.inputs[0])
+        mat_terrain.node_tree.links.new(node_map.outputs[0], node_terrain_type.inputs[0])
+        mat_terrain.node_tree.links.new(node_tex_coord.outputs[0], node_map.inputs[0])
+        mat_terrain.node_tree.links.new(node_pbsdf.outputs[0], node_output.inputs[0])
 
         plane.data.materials.append(mat_terrain)
 
@@ -80,7 +93,7 @@ class terrain():
         light_data = bpy.data.lights.new('light', type='SUN')
         light = bpy.data.objects.new('light', light_data)
         bpy.context.collection.objects.link(light)
-        light.location = (2.5, 2.5, 2.5)
+        light.location = (7.5, 7.5, 7.5)
         light.data.energy = 1.5
 
     def add_sky(self):
@@ -111,7 +124,7 @@ class terrain():
         
         node_map: bpy.types.Node = nodes_world.new("ShaderNodeMapping")
         node_map.location = Vector((-700, 300))
-        node_map.inputs[1].default_value[0] = 0.28
+        node_map.inputs[1].default_value[0] = 0.2
         node_map.inputs[2].default_value[1] = -1.5708
         
         node_tex_coord: bpy.types.Node = nodes_world.new("ShaderNodeTexCoord")
