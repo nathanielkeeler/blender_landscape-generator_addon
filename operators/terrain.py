@@ -36,7 +36,7 @@ class terrain():
         distortion = random.uniform(-1, 1)
         detail = 7.5
         detail_roughness = 0.3
-        displace_scale = random.uniform(1, 3)
+        displace_scale = random.uniform(1.5, 3)
         random_noise = random.uniform(0.1, 1)
         color_ramp_black = random.uniform(0.3, 0.4)
         color_ramp_white = random.uniform(0.5, 0.6)
