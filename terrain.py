@@ -5,16 +5,16 @@ from bpy.types import Nodes
 from mathutils import Vector
 import os
 
-class terrain():
+class Terrain():
     # Szene leeren
-    bpy.ops.object.select_all(action='SELECT') # selektiert alle Objekte
-    bpy.ops.object.delete(use_global=False, confirm=False) # löscht selektierte objekte
-    bpy.ops.outliner.orphans_purge() # löscht überbleibende Meshdaten etc.
+    # bpy.ops.object.select_all(action='SELECT') # selektiert alle Objekte
+    # bpy.ops.object.delete(use_global=False, confirm=False) # löscht selektierte objekte
+    # bpy.ops.outliner.orphans_purge() # löscht überbleibende Meshdaten etc.
 
-    # Delete world nodes
-    world_nodes = bpy.data.worlds['World'].node_tree
-    for currentNode in world_nodes.nodes:
-        world_nodes.nodes.remove(currentNode)
+    # # Delete world nodes
+    # world_nodes = bpy.data.worlds['World'].node_tree
+    # for currentNode in world_nodes.nodes:
+    #     world_nodes.nodes.remove(currentNode)
 
     
     
@@ -44,7 +44,7 @@ class terrain():
         hdr_image: bpy.types.Image = bpy.data.images.load(
             os.path.dirname(os.path.realpath(__file__)).replace(
                 'terrain.blend',
-                'hdr\\flower_road_2k.hdr'
+                'resources\\hdr\\flower_road_2k.hdr'
             )
         )
         node_env_tex.image = hdr_image
@@ -200,7 +200,7 @@ class terrain():
         image_rock: bpy.types.Image = bpy.data.images.load(
             os.path.dirname(os.path.realpath(__file__)).replace(
                 'terrain.blend',
-                'textures\\rock\\TexturesCom_Rock_Cliff3_2x2_512_albedo.tif'
+                'resources\\textures\\rock\\TexturesCom_Rock_Cliff3_2x2_512_albedo.tif'
             )
         )
         node_rock_tex.image = image_rock
@@ -219,7 +219,7 @@ class terrain():
         image_rock_roughness: bpy.types.Image = bpy.data.images.load(
             os.path.dirname(os.path.realpath(__file__)).replace(
                 'terrain.blend',
-                'textures\\rock\\TexturesCom_Rock_Cliff3_2x2_512_roughness.tif'
+                'resources\\textures\\rock\\TexturesCom_Rock_Cliff3_2x2_512_roughness.tif'
             )
         )
         image_rock_roughness.colorspace_settings.name = 'Non-Color'
@@ -239,7 +239,7 @@ class terrain():
         image_rock_normal: bpy.types.Image = bpy.data.images.load(
             os.path.dirname(os.path.realpath(__file__)).replace(
                 'terrain.blend',
-                'textures\\rock\\TexturesCom_Rock_Cliff3_2x2_512_normal.tif'
+                'resources\\textures\\rock\\TexturesCom_Rock_Cliff3_2x2_512_normal.tif'
             )
         )
         image_rock_normal.colorspace_settings.name = 'Non-Color'
@@ -280,7 +280,7 @@ class terrain():
         image_moss: bpy.types.Image = bpy.data.images.load(
             os.path.dirname(os.path.realpath(__file__)).replace(
                 'terrain.blend',
-                'textures\\moss\\TexturesCom_Nature_Moss_512_albedo.tif'
+                'resources\\textures\\moss\\TexturesCom_Nature_Moss_512_albedo.tif'
             )
         )
         node_moss_tex.image = image_moss
@@ -295,7 +295,7 @@ class terrain():
         image_moss_roughness: bpy.types.Image = bpy.data.images.load(
             os.path.dirname(os.path.realpath(__file__)).replace(
                 'terrain.blend',
-                'textures\\moss\\TexturesCom_Nature_Moss_512_roughness.tif'
+                'resources\\textures\\moss\\TexturesCom_Nature_Moss_512_roughness.tif'
             )
         )
         image_moss_roughness.colorspace_settings.name = 'Non-Color'
@@ -312,7 +312,7 @@ class terrain():
         image_moss_normal: bpy.types.Image = bpy.data.images.load(
             os.path.dirname(os.path.realpath(__file__)).replace(
                 'terrain.blend',
-                'textures\\moss\\TexturesCom_Nature_Moss_512_normal.tif'
+                'resources\\textures\\moss\\TexturesCom_Nature_Moss_512_normal.tif'
             )
         )
         image_moss_normal.colorspace_settings.name = 'Non-Color'
@@ -353,7 +353,7 @@ class terrain():
         image_sand: bpy.types.Image = bpy.data.images.load(
             os.path.dirname(os.path.realpath(__file__)).replace(
                 'terrain.blend',
-                'textures\\sand\\TexturesCom_Ground_SandDesert1_3x3_512_albedo.tif'
+                'resources\\textures\\sand\\TexturesCom_Ground_SandDesert1_3x3_512_albedo.tif'
             )
         )
         node_sand_tex.image = image_sand
@@ -373,7 +373,7 @@ class terrain():
         image_sand_roughness: bpy.types.Image = bpy.data.images.load(
             os.path.dirname(os.path.realpath(__file__)).replace(
                 'terrain.blend',
-                'textures\\sand\\TexturesCom_Ground_SandDesert1_3x3_512_roughness.tif'
+                'resources\\textures\\sand\\TexturesCom_Ground_SandDesert1_3x3_512_roughness.tif'
             )
         )
         image_sand_roughness.colorspace_settings.name = 'Non-Color'
@@ -394,7 +394,7 @@ class terrain():
         image_sand_normal: bpy.types.Image = bpy.data.images.load(
             os.path.dirname(os.path.realpath(__file__)).replace(
                 'terrain.blend',
-                'textures\\sand\\TexturesCom_Ground_SandDesert1_3x3_512_normal.tif'
+                'resources\\textures\\sand\\TexturesCom_Ground_SandDesert1_3x3_512_normal.tif'
             )
         )
         image_sand_normal.colorspace_settings.name = 'Non-Color'
