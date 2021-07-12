@@ -1,24 +1,25 @@
 import bpy
-import random
-import typing
 import math
 
 
-class house():
+class House():
+    def __init__(self):
+        self.generateHouse()
 
-    bpy.ops.object.select_all(action='SELECT') # selektiert alle Objekte
+    '''bpy.ops.object.select_all(action='SELECT') # selektiert alle Objekte
     bpy.ops.object.delete(use_global=False, confirm=False) # löscht selektierte objekte
-    bpy.ops.outliner.orphans_purge() # löscht überbleibende Meshdaten etc.
+    bpy.ops.outliner.orphans_purge() # löscht überbleibende Meshdaten etc.'''
     
     height = 1#nicht verändern
-    width_Y = 1.9
-    width_X = 1.9
+    width_Y = 1.5
+    width_X = 1.4
     num_wood_logs = 7
     log_radius = height/num_wood_logs
     roof_overhang = log_radius*3
     posX = 0
     posY = 0
     posZ = 0
+    house_size = 0.5
         
     def create_door(self):#Tree Leaves 
         doorArray = []
@@ -45,7 +46,7 @@ class house():
         for obj in bpy.context.selected_objects:
             obj.name = "Door"
         door = bpy.data.objects["Door"]    
-        door_mat = self.base_material()
+        door_mat = self.roof_material()
         door.data.materials.append(door_mat)
         doorArray.append(door)
         
@@ -173,7 +174,23 @@ class house():
         
         #DOOR
         door = self.create_door()
+        houseArray = []
+        houseArray.append(door)
+        houseArray.append(base)
+        houseArray.append(roof)
+
+        for h in houseArray:
+            door.select_set(True)
+            base.select_set(True)
+            roof.select_set(True)
+        bpy.ops.object.join()
+        for obj in bpy.context.selected_objects:
+            obj.name = "Blockhouse"
         
+        #Sclae
+        '''door.scale = self.house_size,self.house_size,self.house_size
+        base.scale = self.house_size,self.house_size,self.house_size
+        roof.scale = self.house_size,self.house_size,self.house_size'''
         '''
         win = self.createWindows()
         modifier_bool = base.modifiers.new("Windows bool","BOOLEAN")
@@ -181,6 +198,5 @@ class house():
         
         
         
-t = house()
-t.generateHouse()
+
 

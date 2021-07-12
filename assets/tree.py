@@ -1,13 +1,15 @@
 import bpy
 import random
-import typing
-import math
 
-class tree():
 
-    bpy.ops.object.select_all(action='SELECT') # selektiert alle Objekte
+class Tree():
+    def __init__(self):
+        self.generateTree()
+
+
+    '''bpy.ops.object.select_all(action='SELECT') # selektiert alle Objekte
     bpy.ops.object.delete(use_global=False, confirm=False) # löscht selektierte objekte
-    bpy.ops.outliner.orphans_purge() # löscht überbleibende Meshdaten etc.
+    bpy.ops.outliner.orphans_purge() # löscht überbleibende Meshdaten etc.'''
     
     verts = [(0,0,0),(0,0,0.002),(0.02,-0.02, 0.32),(0, -0 , 0.6),( 0.17, 0.15, 0.86),(0.42, 0.13, 1.04),(0.02,0.31,1.06),(-0.3,0 ,0.8),(-0.39,0.15,0.95),( -0.46,-0.11,0.98),( 0,-0.36,0.91),(-0.09, -0.52, 1.06),( 0.18,-0.43,1.08)]
     edges = [(0,1), (1,2), (2,3), (3,4),(4,5), (4,6), (3,7), (7,8),(7,9), (3,10), (10,11), (10,12)]
@@ -123,6 +125,16 @@ class tree():
         leaves.data.materials.append(leaves_mat) #leaves durch treetop ersetzen hehe
         leaves.scale = self.tree_size,self.tree_size,self.tree_size
         leaves.location = self.posX+self.tree_size/4,-self.tree_size/4+self.posY,self.posZ+self.tree_size
-t = tree()
-t.generateTree()
+
+
+        '''treeArray = []
+        treeArray.append(trunk)
+        treeArray.append(leaves)
+
+        for p in treeArray:
+            p.select_set(True)
+            p.select_set(True)
+        bpy.ops.object.join()
+        for obj in bpy.context.selected_objects:
+            obj.name = "TreeTree"'''
 

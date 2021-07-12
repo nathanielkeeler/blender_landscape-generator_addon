@@ -1,18 +1,21 @@
 import bpy
 import random
-import typing
-import math
 
-class pine():
 
-    bpy.ops.object.select_all(action='SELECT') # selektiert alle Objekte
-    bpy.ops.object.delete(use_global=False, confirm=False) # löscht selektierte objekte
-    bpy.ops.outliner.orphans_purge() # löscht überbleibende Meshdaten etc.
 
-    verts = [(0,0,-0.02),(0,0,0.02),(0,0,0.15),(0.02,0,0.3),(0,0.01,0.45),(0.01,0,0.6),(0,0,0.75),(0,0,0.9),(0,0.01,1)]
+class Pine():
+    
+    def __init__(self):
+        self.generatePine()
+
+    # bpy.ops.object.select_all(action='SELECT') # selektiert alle Objekte
+    # bpy.ops.object.delete(use_global=False, confirm=False) # löscht selektierte objekte
+    # bpy.ops.outliner.orphans_purge() # löscht überbleibende Meshdaten etc.
+
+    verts = [(0,0,-0.02),(0,0,0.02),(0,0,0.15),(0.02,0,0.3),(0,0.01,0.45),(0.01,0,0.6),(0,0,0.75),(0,0,0.9),(0,0,1)]
     edges = [(0,1), (1,2), (2,3), (3,4),(4,5), (5,6) ,(6,7),(7,8)]
     
-    pine_size = 1
+    pine_size = 1.5
     posX = 0
     posY = 0
     posZ = 0
@@ -20,7 +23,7 @@ class pine():
     def pineNeedles(self): 
         pine_needles = []
         for i in range(len(self.verts)):
-            randomSize = random.uniform(0.21,0.33)
+            randomSize = random.uniform(0.21,0.30)
             if i >= 2 and i <= len(self.verts) - 3:
                 bpy.ops.mesh.primitive_cone_add(vertices=12, radius1 = 0.5-(i/15), depth=0.5-(i/20), location=(self.verts[1+i]), scale=(1, 1, 1))
                 num = random.randint(0,2)
@@ -124,10 +127,23 @@ class pine():
         needles = bpy.data.objects["Needles"]
         needle_mat = self.needle_material()
         needles.data.materials.append(needle_mat)
+
+        # pineArray = []
+        # pineArray.append(trunk)
+        # pineArray.append(needles)
+
+        # for p in pineArray:
+        #     p.select_set(True)
+        #     p.select_set(True)
+        # bpy.ops.object.join()
+        # for obj in bpy.context.selected_objects:
+        #     obj.name = "PineTree"
+
         #größe
         needles.scale = self.pine_size,self.pine_size,self.pine_size
         needles.location = self.posX, self.posY, self.posZ + self.pine_size
         
+
         
-t = pine()
-t.generatePine()
+        
+
