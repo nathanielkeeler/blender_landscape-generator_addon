@@ -154,12 +154,16 @@ class Terrain():
         # Nodes: Texture (Water)
             # color ramp (left) 2
         node_color_ramp_2: bpy.types.Node = nodes_terrain.new("ShaderNodeValToRGB")
-        node_color_ramp_2.location = Vector((-2400, 550))
+        node_color_ramp_2.location = Vector((-1300, 1700))
         node_color_ramp_2.color_ramp.interpolation = 'EASE'
+        node_color_ramp_2.color_ramp.elements[0].position = 0.351
+        node_color_ramp_2.color_ramp.elements[1].position = 0.365
             # color ramp (left) 3
         node_color_ramp_3: bpy.types.Node = nodes_terrain.new("ShaderNodeValToRGB")
-        node_color_ramp_3.location = Vector((-2400, 300))
-        node_color_ramp_3.color_ramp.interpolation = 'EASE'
+        node_color_ramp_3.location = Vector((-900, -100))
+        node_color_ramp_3.color_ramp.interpolation = 'CARDINAL'
+        node_color_ramp_3.color_ramp.elements[0].position = 0.357
+        node_color_ramp_3.color_ramp.elements[1].position = 0.369
             # color ramp (left) 4
         node_color_ramp_4: bpy.types.Node = nodes_terrain.new("ShaderNodeValToRGB")
         node_color_ramp_4.location = Vector((-2400, -1300))
@@ -188,7 +192,6 @@ class Terrain():
 
             # connect gloss, color_ramp and pbsdf shaders to mix shader and mix shader to output
         mat_terrain.node_tree.links.new(node_water_level.outputs[0], node_mix_shader.inputs[0])
-        mat_terrain.node_tree.links.new(node_water_gloss.outputs[0], node_mix_shader.inputs[1])
         mat_terrain.node_tree.links.new(node_pbsdf.outputs[0], node_mix_shader.inputs[2])
         mat_terrain.node_tree.links.new(node_mix_shader.outputs[0], node_output.inputs[0])
         
@@ -386,7 +389,6 @@ class Terrain():
             # connect nodes
         mat_terrain.node_tree.links.new(node_sand_roughness_tex.outputs[0], node_sand_mix_rgb_1.inputs[1])
         mat_terrain.node_tree.links.new(node_rock_mix_rgb_1.outputs[0], node_sand_mix_rgb_1.inputs[2])
-        mat_terrain.node_tree.links.new(node_sand_mix_rgb_1.outputs[0], node_pbsdf.inputs[8])
 
             # add sand normal_map texture node
         node_sand_normal_tex: bpy.types.Node = nodes_terrain.new("ShaderNodeTexImage")
@@ -424,7 +426,72 @@ class Terrain():
         node_color_ramp_4.color_ramp.elements[0].position = 0.34
         node_color_ramp_4.color_ramp.elements[1].position = 0.38
 
+        # Nodes: Texture (Water Foam)
+        node_pbsdf_1: bpy.types.Node = nodes_terrain.new("ShaderNodeBsdfPrincipled")
+        node_pbsdf_1.location = Vector((-700, 2000))
+
+        node_mix_shader_1: bpy.types.Node = nodes_terrain.new("ShaderNodeMixShader")
+        node_mix_shader_1.location = Vector((-300, 1500))
+
+            # connect both nodes
+        mat_terrain.node_tree.links.new(node_pbsdf_1.outputs[0], node_mix_shader_1.inputs[2])
+        mat_terrain.node_tree.links.new(node_water_gloss.outputs[0], node_mix_shader_1.inputs[1])
+        mat_terrain.node_tree.links.new(node_mix_shader_1.outputs[0], node_mix_shader.inputs[1])
+        mat_terrain.node_tree.links.new(node_color_ramp_2.outputs[0], node_mix_shader_1.inputs[0])
+
+            # bump node for foam texture
+        node_bump: bpy.types.Node = nodes_terrain.new("ShaderNodeBump")
+        node_bump.location = Vector((-1000, 1600))
+
+            # connect to pbsdf and color ramp_2
+        mat_terrain.node_tree.links.new(node_color_ramp_2.outputs[0], node_bump.inputs[2])
+        mat_terrain.node_tree.links.new(node_bump.outputs[0], node_pbsdf_1.inputs[20])
+
+            # bump node for foam texture
+        node_bump_1: bpy.types.Node = nodes_terrain.new("ShaderNodeBump")
+        node_bump_1.location = Vector((-1000, 1300))
+
+            # bump node for foam texture
+        node_noise_tex: bpy.types.Node = nodes_terrain.new("ShaderNodeTexNoise")
+        node_noise_tex.location = Vector((-1200, 1300))
+
+            # connect nodes
+        mat_terrain.node_tree.links.new(node_noise_tex.outputs[0], node_bump_1.inputs[2])
+        mat_terrain.node_tree.links.new(node_bump_1.outputs[0], node_water_gloss.inputs[2])
+
+            # water surface
+        node_map_2: bpy.types.Node = nodes_terrain.new("ShaderNodeMapping")
+        node_map_2.location = Vector((-1400, 1300))
+        node_map_2.inputs[3].default_value[1] = 30
+        node_map_2.inputs[3].default_value[0] = 30
+
+
+        node_tex_coord_2: bpy.types.Node = nodes_terrain.new("ShaderNodeTexCoord")
+        node_tex_coord_2.location = Vector((-1600, 1300))
+
+            # connect to noise tex
+        mat_terrain.node_tree.links.new(node_tex_coord_2.outputs[0], node_map_2.inputs[0])
+        mat_terrain.node_tree.links.new(node_map_2.outputs[0], node_noise_tex.inputs[0])
+
+            # dark sand near water
+        node_dark_sand_mix_rgb: bpy.types.Node = nodes_terrain.new("ShaderNodeMixRGB")
+        node_dark_sand_mix_rgb.location = Vector((-600, -400))
+        node_dark_sand_mix_rgb.blend_type = 'MULTIPLY'
+        node_dark_sand_mix_rgb.inputs[0].default_value = 0.85
         
+        node_dark_sand_mix_rgb_1: bpy.types.Node = nodes_terrain.new("ShaderNodeMixRGB")
+        node_dark_sand_mix_rgb_1.location = Vector((-600, -700))
+        node_dark_sand_mix_rgb_1.blend_type = 'MULTIPLY'
+
+            # connect to pbsdf
+        mat_terrain.node_tree.links.new(node_sand_mix_rgb.outputs[0], node_dark_sand_mix_rgb.inputs[1])
+        mat_terrain.node_tree.links.new(node_sand_mix_rgb_1.outputs[0], node_dark_sand_mix_rgb_1.inputs[1])
+        mat_terrain.node_tree.links.new(node_dark_sand_mix_rgb.outputs[0], node_pbsdf.inputs[0])
+        mat_terrain.node_tree.links.new(node_dark_sand_mix_rgb_1.outputs[0], node_pbsdf.inputs[7])
+
+            # connect color ramp_3
+        mat_terrain.node_tree.links.new(node_color_ramp_3.outputs[0], node_dark_sand_mix_rgb.inputs[2])
+        mat_terrain.node_tree.links.new(node_color_ramp_3.outputs[0], node_dark_sand_mix_rgb_1.inputs[2])
 
         # Append Material to Plane
         plane.data.materials.append(mat_terrain)
