@@ -7,15 +7,14 @@ import os
 
 class Terrain():
     # Szene leeren
-    # bpy.ops.object.select_all(action='SELECT') # selektiert alle Objekte
-    # bpy.ops.object.delete(use_global=False, confirm=False) # löscht selektierte objekte
-    # bpy.ops.outliner.orphans_purge() # löscht überbleibende Meshdaten etc.
+    bpy.ops.object.select_all(action='SELECT') # selektiert alle Objekte
+    bpy.ops.object.delete(use_global=False, confirm=False) # löscht selektierte objekte
+    bpy.ops.outliner.orphans_purge() # löscht überbleibende Meshdaten etc.
 
-    # # Delete world nodes
-    # world_nodes = bpy.data.worlds['World'].node_tree
-    # for currentNode in world_nodes.nodes:
-    #     world_nodes.nodes.remove(currentNode)
-
+    # Delete world nodes
+    world_nodes = bpy.data.worlds['World'].node_tree
+    for currentNode in world_nodes.nodes:
+        world_nodes.nodes.remove(currentNode)
     
     
     def add_lighting(self):
@@ -425,14 +424,14 @@ class Terrain():
         node_color_ramp_4.color_ramp.elements[0].position = 0.34
         node_color_ramp_4.color_ramp.elements[1].position = 0.38
 
-
+        
 
         # Append Material to Plane
         plane.data.materials.append(mat_terrain)
             
 
 
-t = terrain()    
+t = Terrain()    
 t.generate_terrain()
 t.add_lighting()
 t.add_sky()
