@@ -153,7 +153,7 @@ class Object_OT_generate_terrain(bpy.types.Operator):
             # add rock roughness texture node
         node_rock_roughness_tex: bpy.types.Node = nodes_terrain.new("ShaderNodeTexImage")
         node_rock_roughness_tex.image = bpy.data.images["TexturesCom_Rock_Cliff3_2x2_512_roughness.tif"]
-        node_rock_roughness_tex.colorspace_settings.name = 'Non-Color'
+        node_rock_roughness_tex.image.colorspace_settings.name = 'Non-Color'
         node_rock_roughness_tex.location = Vector((-1800, -900))
 
             # mix_rgb node
@@ -167,7 +167,7 @@ class Object_OT_generate_terrain(bpy.types.Operator):
             # add rock normal map texture node
         node_rock_normal_tex: bpy.types.Node = nodes_terrain.new("ShaderNodeTexImage")
         node_rock_normal_tex.image = bpy.data.images["TexturesCom_Rock_Cliff3_2x2_512_normal.tif"]
-        node_rock_normal_tex.colorspace_settings.name = 'Non-Color'
+        node_rock_normal_tex.image.colorspace_settings.name = 'Non-Color'
         node_rock_normal_tex.location = Vector((-1800, -1500))
 
             # mix_rgb node
@@ -214,7 +214,7 @@ class Object_OT_generate_terrain(bpy.types.Operator):
             # add moss roughness texture node
         node_moss_roughness_tex: bpy.types.Node = nodes_terrain.new("ShaderNodeTexImage")
         node_moss_roughness_tex.image = bpy.data.images["TexturesCom_Nature_Moss_512_roughness.tif"]
-        node_moss_roughness_tex.colorspace_settings.name = 'Non-Color'
+        node_moss_roughness_tex.image.colorspace_settings.name = 'Non-Color'
         node_moss_roughness_tex.location = Vector((-1800, -1200))
             
             # connect map node to normal texture to mix rgb
@@ -225,7 +225,7 @@ class Object_OT_generate_terrain(bpy.types.Operator):
             # add moss normal_map texture node
         node_moss_normal_tex: bpy.types.Node = nodes_terrain.new("ShaderNodeTexImage")
         node_moss_normal_tex.image = bpy.data.images["TexturesCom_Nature_Moss_512_normal.tif"]
-        node_moss_normal_tex.colorspace_settings.name = 'Non-Color'
+        node_moss_normal_tex.image.colorspace_settings.name = 'Non-Color'
         node_moss_normal_tex.location = Vector((-1800, -1800))
             
             # connect map node to normal texture to mix rgb
@@ -278,7 +278,7 @@ class Object_OT_generate_terrain(bpy.types.Operator):
             # add sand roughness_map texture node
         node_sand_roughness_tex: bpy.types.Node = nodes_terrain.new("ShaderNodeTexImage")
         node_sand_roughness_tex.image = bpy.data.images["TexturesCom_Ground_SandDesert1_3x3_512_roughness.tif"]
-        node_sand_roughness_tex.colorspace_settings.name = 'Non-Color'
+        node_sand_roughness_tex.image.colorspace_settings.name = 'Non-Color'
         node_sand_roughness_tex.location = Vector((-1250, -900))
 
             # mix_rgb node
@@ -292,7 +292,7 @@ class Object_OT_generate_terrain(bpy.types.Operator):
             # add sand normal_map texture node
         node_sand_normal_tex: bpy.types.Node = nodes_terrain.new("ShaderNodeTexImage")
         node_sand_normal_tex.image = bpy.data.images["TexturesCom_Ground_SandDesert1_3x3_512_normal.tif"]
-        node_sand_normal_tex.colorspace_settings.name = 'Non-Color'
+        node_sand_normal_tex.image.colorspace_settings.name = 'Non-Color'
         node_sand_normal_tex.location = Vector((-1250, -1300))
 
             # mix_rgb node
