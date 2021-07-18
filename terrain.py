@@ -35,7 +35,7 @@ class Terrain():
 
         node_background: bpy.types.Node = nodes_world.new("ShaderNodeBackground")
         node_background.location = Vector((0, 300))
-        node_background.inputs[1].default_value = 0.2
+        node_background.inputs[1].default_value = 0.1
 
         # add HDRI image
         node_env_tex: bpy.types.Node = nodes_world.new("ShaderNodeTexEnvironment")
