@@ -9,12 +9,94 @@ class Object_OT_generate_terrain(bpy.types.Operator):
     """The Tooltip"""
     bl_idname = "object.generate_terrain"
     bl_label = "generate_terrain"
+    bl_options = {'REGISTER', 'UNDO'}
+
+    terrain_size: bpy.props.IntProperty(
+        name="Terrain size",
+        description="Size of the terrain plane.",
+        default=20,
+        min=4,
+        max=100
+    )
+    terrain_scaling: bpy.props.FloatProperty(
+        name="Terrain scale",
+        description="Scale of the terrain itself.",
+        default=random.uniform(1.5, 2.5),
+        min=1,
+        max=3
+    )
+
+    # scale = random.uniform(1.5, 2.5)
+    # distortion = random.uniform(-1, 1)
+    # detail = 7.5
+    # detail_roughness = 0.3
+    # displace_scale = random.uniform(1.5, 3)
+    # random_noise = random.uniform(0.1, 1)
+    # color_ramp_black = random.uniform(0.3, 0.4)
+    # color_ramp_white = random.uniform(0.5, 0.6)
+
 
     def execute(self, context):
+            # add light
+        light_data = bpy.data.lights.new('light', type='SUN')
+        light = bpy.data.objects.new('light', light_data)
+        bpy.context.collection.objects.link(light)
+        light.location = (10, -10, 7.5)
+        light.data.energy = 1.5
+
+        
+        # add HDR
+            # delete world nodes
+        world_nodes = bpy.data.worlds['World'].node_tree
+        for currentNode in world_nodes.nodes:
+            world_nodes.nodes.remove(currentNode)
+        
+        world = bpy.data.worlds['World']
+        world.use_nodes = True
+
+        nodes_world: typing.List[bpy.types.Node] = world.node_tree.nodes
+
+        node_output: bpy.types.Node = nodes_world.new("ShaderNodeOutputWorld")
+        node_output.location = Vector((200, 300))
+
+        node_background: bpy.types.Node = nodes_world.new("ShaderNodeBackground")
+        node_background.location = Vector((0, 300))
+        node_background.inputs[1].default_value = 0.1
+
+        bpy.ops.image.open(directory="//resources//hdr//",files=[{"name":"flower_road_2k.hdr", "name":"flower_road_2k.hdr"}], relative_path=True)
+
+        node_env_tex: bpy.types.Node = nodes_world.new("ShaderNodeTexEnvironment")
+        node_env_tex.location = Vector((-400, 300))
+        node_env_tex.image = bpy.data.images["flower_road_2k.hdr"]
+        
+        node_map: bpy.types.Node = nodes_world.new("ShaderNodeMapping")
+        node_map.location = Vector((-700, 300))
+        node_map.inputs[1].default_value[2] = 0.2
+        
+        node_tex_coord: bpy.types.Node = nodes_world.new("ShaderNodeTexCoord")
+        node_tex_coord.location = Vector((-900, 300))
+
+        # Links
+        links = world.node_tree.links
+        links.new(node_background.outputs[0], node_output.inputs[0])
+        links.new(node_env_tex.outputs[0], node_background.inputs[0])
+        links.new(node_map.outputs[0], node_env_tex.inputs[0])
+        links.new(node_tex_coord.outputs[0], node_map.inputs[0])
+
+        # Ray Settings
+        world.light_settings.use_ambient_occlusion = True
+        world.cycles_visibility.diffuse = True
+        world.cycles_visibility.glossy = True
+        world.cycles_visibility.transmission = True
+        world.cycles_visibility.scatter = True
+
+
+
+        # TERRAIN!
         
         bpy.context.scene.render.engine = 'CYCLES'
 
-        bpy.ops.mesh.primitive_plane_add(size=(20))
+        bpy.ops.mesh.primitive_plane_add(size=self.terrain_size)
         plane = bpy.context.object
 
         mod_terrain = plane.modifiers.new("t_subsurf", "SUBSURF")
@@ -122,6 +204,8 @@ class Object_OT_generate_terrain(bpy.types.Operator):
         node_water_gloss: bpy.types.Node = nodes_terrain.new("ShaderNodeBsdfGlossy")
         node_water_gloss.location = Vector((-600, 1200))
         node_water_gloss.inputs[1].default_value = 0.045
+        node_water_gloss.inputs[0].default_value = (0.236871, 0.292942, 0.504464, 1)
+
 
             # Mix Shader
         node_mix_shader: bpy.types.Node = nodes_terrain.new("ShaderNodeMixShader")
