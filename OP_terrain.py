@@ -1,29 +1,93 @@
-bl_info = {
-    "name": "Terrain Generator",
-    "author": "Nathaniel Keeler, Maren Röttele",
-    "blender": (2,92,0),
-    "version": (1,0),
-    "category": "Object",
-    "description": "Adds a generated terrain to the scene.",
-    "url": "https://github.com/nathanielkeeler/Umgebungsgenerator"
-}
-
-
 import bpy
 import random
 import typing
-from bpy.types import Nodes
 from mathutils import Vector
-import os
 
 class Object_OT_generate_terrain(bpy.types.Operator):
-    """The Tooltip"""
+    """Landscape Generator"""
     bl_idname = "mesh.generate_terrain"
     bl_label = "generate_terrain"
     bl_options = {'REGISTER', 'UNDO'}
 
 
+    # Properties
+
+    terrain_size : bpy.props.IntProperty(
+        name='Terrain size',
+        description='Size of the terrain plane.',
+        default=25,
+        min=4,
+        soft_max=60
+    )
+
+    scale : bpy.props.FloatProperty(
+        name='Terrain density',
+        description='Scaling of the terrain texture density.',
+        default=random.uniform(1.5, 2.5),
+        min=0,
+        soft_min=1,
+        soft_max=10
+    )
+
+    distortion : bpy.props.FloatProperty(
+        name='Terrain distortion',
+        description='Amount of distortion for the terrain texture.',
+        default=random.uniform(0, 2),
+        min=0,
+        soft_max=4
+    )
+
+    detail : bpy.props.FloatProperty(
+        name='Terrain detail',
+        description='Amount of detail for the terrain texture.',
+        default=16,
+        min=0,
+        soft_max=16
+    )
+
+    detail_roughness : bpy.props.FloatProperty(
+        name='Terrain detail roughness',
+        description='Amount of roughness to details.',
+        default=0.3,
+        min=0,
+        soft_max=0.5
+    )
+
+    displace_scale : bpy.props.FloatProperty(
+        name='Terrain scale',
+        description='Scaling of the terrain height.',
+        default=random.uniform(1.5, 3),
+        min=0,
+        soft_max=4
+    )
+
+    random_noise : bpy.props.FloatProperty(
+        name='Randomness',
+        description='Amount of distortion for the terrain texture.',
+        default=1,
+        min=0
+    )
+    
+    color_ramp_black : bpy.props.FloatProperty(
+        name='Terrain steepness',
+        description='Amount of distortion for the terrain texture.',
+        default=random.uniform(0.3, 0.4),
+        soft_min=0.2,
+        soft_max=0.5
+    )
+
+    color_ramp_white : bpy.props.FloatProperty(
+        name='Terrain steepness',
+        description='Amount of distortion for the terrain texture.',
+        default=random.uniform(0.5, 0.6),
+        soft_min=0.5,
+        soft_max=0.7
+    )
+
+
     def execute(self, context):
+
+        bpy.ops.outliner.orphans_purge()
             # add light
         light_data = bpy.data.lights.new('light', type='SUN')
         light = bpy.data.objects.new('light', light_data)
@@ -83,20 +147,21 @@ class Object_OT_generate_terrain(bpy.types.Operator):
 
         # Variables
             # Terrain Form
-        terrain_size = 25
-        scale = random.uniform(1.5, 2.5)
-        distortion = random.uniform(-1, 1)
-        detail = 7.5
-        detail_roughness = 0.3
-        displace_scale = random.uniform(1.5, 3)
-        random_noise = random.uniform(0.1, 1)
-        color_ramp_black = random.uniform(0.3, 0.4)
-        color_ramp_white = random.uniform(0.5, 0.6)
+        # terrain_size = 25
+        # scale = random.uniform(1.5, 2.5)
+        # distortion = random.uniform(-1, 1)
+        # detail = 16
+        # detail_roughness = 0.3
+        # displace_scale = random.uniform(1.5, 3)
+        # random_noise = 1
+        # color_ramp_black = random.uniform(0.3, 0.4)
+        # color_ramp_white = random.uniform(0.5, 0.6)
         
         bpy.context.scene.render.engine = 'CYCLES'
 
-        bpy.ops.mesh.primitive_plane_add(size=terrain_size)
+        bpy.ops.mesh.primitive_plane_add(size=self.terrain_size)
         plane = bpy.context.object
+        plane.name="Landscape"
 
         mod_terrain = plane.modifiers.new("t_subsurf", "SUBSURF")
         mod_terrain.subdivision_type = 'SIMPLE'
@@ -119,27 +184,27 @@ class Object_OT_generate_terrain(bpy.types.Operator):
             #
         node_terrain_displace: bpy.types.Node = nodes_terrain.new("ShaderNodeDisplacement")
         node_terrain_displace.location = Vector((130, 200))
-        node_terrain_displace.inputs[2].default_value = displace_scale
+        node_terrain_displace.inputs[2].default_value = self.displace_scale
 
             #
         node_color_ramp: bpy.types.Node = nodes_terrain.new("ShaderNodeValToRGB")
         node_color_ramp.location = Vector((-2400, 800))
         node_color_ramp.color_ramp.interpolation = 'EASE'
-        node_color_ramp.color_ramp.elements[0].position = color_ramp_black
-        node_color_ramp.color_ramp.elements[1].position = color_ramp_white
+        node_color_ramp.color_ramp.elements[0].position = self.color_ramp_black
+        node_color_ramp.color_ramp.elements[1].position = self.color_ramp_white
 
             #
         node_terrain_type: bpy.types.Node = nodes_terrain.new("ShaderNodeTexNoise")
         node_terrain_type.location = Vector((-2600, 800))
-        node_terrain_type.inputs[2].default_value = scale
-        node_terrain_type.inputs[3].default_value = detail
-        node_terrain_type.inputs[4].default_value = detail_roughness
-        node_terrain_type.inputs[5].default_value = distortion
+        node_terrain_type.inputs[2].default_value = self.scale
+        node_terrain_type.inputs[3].default_value = self.detail
+        node_terrain_type.inputs[4].default_value = self.detail_roughness
+        node_terrain_type.inputs[5].default_value = self.distortion
 
             #
         node_map: bpy.types.Node = nodes_terrain.new("ShaderNodeMapping")
         node_map.location = Vector((-2800, 800))
-        node_map.inputs[1].default_value[1] = random_noise
+        node_map.inputs[1].default_value[1] = self.random_noise
 
             #
         node_tex_coord: bpy.types.Node = nodes_terrain.new("ShaderNodeTexCoord")
@@ -468,32 +533,28 @@ class VIEW3D_PT_landscape_generator(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
     bl_category = "Landscape Gen"
-    bl_label = "Grid"
+    bl_label = "Properties"
 
     def draw(self,context):
         self.layout.operator(
             'mesh.generate_terrain', text='Generate Landscape', icon='OUTLINER_OB_IMAGE'
         )
 
-        props = self.layout.operator(
-            'mesh.generate_terrain', text='Small', icon='OUTLINER_OB_IMAGE')
-        props.terrain_size = 4
+def mesh_add_menu_draw(self, context):
+    self.layout.operator(
+        'mesh.generate_terrain', text='Generate Landscape', icon='OUTLINER_OB_IMAGE'
+    )
 
-
-
-    # scale = random.uniform(1.5, 2.5)
-    # distortion = random.uniform(-1, 1)
-    # detail = 7.5
-    # detail_roughness = 0.3
-    # displace_scale = random.uniform(1.5, 3)
-    # random_noise = random.uniform(0.1, 1)
-    # color_ramp_black = random.uniform(0.3, 0.4)
-    # color_ramp_white = random.uniform(0.5, 0.6)
 
 def register():
     bpy.utils.register_class(Object_OT_generate_terrain)
     bpy.utils.register_class(VIEW3D_PT_landscape_generator)
+    bpy.types.VIEW3D_MT_mesh_add.append(mesh_add_menu_draw)
 
 def unregister():
     bpy.utils.unregister_class(Object_OT_generate_terrain)
     bpy.utils.unregister_class(VIEW3D_PT_landscape_generator)
+    bpy.types.VIEW3D_MT_mesh_add.remove(mesh_add_menu_draw)
+
+if __name__ == '__main__':
+    register()
