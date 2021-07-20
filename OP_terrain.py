@@ -1,3 +1,14 @@
+bl_info = {
+    "name": "Terrain Generator",
+    "author": "Nathaniel Keeler, Maren Röttele",
+    "blender": (2,92,0),
+    "version": (1,0),
+    "category": "Object",
+    "description": "Adds a generated terrain to the scene.",
+    "url": "https://github.com/nathanielkeeler/Umgebungsgenerator"
+}
+
+
 import bpy
 import random
 import typing
@@ -7,33 +18,9 @@ import os
 
 class Object_OT_generate_terrain(bpy.types.Operator):
     """The Tooltip"""
-    bl_idname = "object.generate_terrain"
+    bl_idname = "mesh.generate_terrain"
     bl_label = "generate_terrain"
     bl_options = {'REGISTER', 'UNDO'}
-
-    terrain_size: bpy.props.IntProperty(
-        name="Terrain size",
-        description="Size of the terrain plane.",
-        default=20,
-        min=4,
-        max=100
-    )
-    terrain_scaling: bpy.props.FloatProperty(
-        name="Terrain scale",
-        description="Scale of the terrain itself.",
-        default=random.uniform(1.5, 2.5),
-        min=1,
-        max=3
-    )
-
-    # scale = random.uniform(1.5, 2.5)
-    # distortion = random.uniform(-1, 1)
-    # detail = 7.5
-    # detail_roughness = 0.3
-    # displace_scale = random.uniform(1.5, 3)
-    # random_noise = random.uniform(0.1, 1)
-    # color_ramp_black = random.uniform(0.3, 0.4)
-    # color_ramp_white = random.uniform(0.5, 0.6)
 
 
     def execute(self, context):
@@ -93,10 +80,22 @@ class Object_OT_generate_terrain(bpy.types.Operator):
 
 
         # TERRAIN!
+
+        # Variables
+            # Terrain Form
+        terrain_size = 25
+        scale = random.uniform(1.5, 2.5)
+        distortion = random.uniform(-1, 1)
+        detail = 7.5
+        detail_roughness = 0.3
+        displace_scale = random.uniform(1.5, 3)
+        random_noise = random.uniform(0.1, 1)
+        color_ramp_black = random.uniform(0.3, 0.4)
+        color_ramp_white = random.uniform(0.5, 0.6)
         
         bpy.context.scene.render.engine = 'CYCLES'
 
-        bpy.ops.mesh.primitive_plane_add(size=self.terrain_size)
+        bpy.ops.mesh.primitive_plane_add(size=terrain_size)
         plane = bpy.context.object
 
         mod_terrain = plane.modifiers.new("t_subsurf", "SUBSURF")
@@ -111,17 +110,6 @@ class Object_OT_generate_terrain(bpy.types.Operator):
         mat_terrain.cycles.displacement_method = 'BOTH'
 
         mat_terrain.use_nodes = True
-
-        # Variables
-            # Terrain Form
-        scale = random.uniform(1.5, 2.5)
-        distortion = random.uniform(-1, 1)
-        detail = 7.5
-        detail_roughness = 0.3
-        displace_scale = random.uniform(1.5, 3)
-        random_noise = random.uniform(0.1, 1)
-        color_ramp_black = random.uniform(0.3, 0.4)
-        color_ramp_white = random.uniform(0.5, 0.6)
 
         # Nodes: Terrain Form
         nodes_terrain: typing.List[bpy.types.Node] = mat_terrain.node_tree.nodes
@@ -476,11 +464,36 @@ class Object_OT_generate_terrain(bpy.types.Operator):
 
         return {'FINISHED'}
 
+class VIEW3D_PT_landscape_generator(bpy.types.Panel):
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = "Landscape Gen"
+    bl_label = "Grid"
+
+    def draw(self,context):
+        self.layout.operator(
+            'mesh.generate_terrain', text='Generate Landscape', icon='OUTLINER_OB_IMAGE'
+        )
+
+        props = self.layout.operator(
+            'mesh.generate_terrain', text='Small', icon='OUTLINER_OB_IMAGE')
+        props.terrain_size = 4
+
+
+
+    # scale = random.uniform(1.5, 2.5)
+    # distortion = random.uniform(-1, 1)
+    # detail = 7.5
+    # detail_roughness = 0.3
+    # displace_scale = random.uniform(1.5, 3)
+    # random_noise = random.uniform(0.1, 1)
+    # color_ramp_black = random.uniform(0.3, 0.4)
+    # color_ramp_white = random.uniform(0.5, 0.6)
+
 def register():
     bpy.utils.register_class(Object_OT_generate_terrain)
+    bpy.utils.register_class(VIEW3D_PT_landscape_generator)
 
 def unregister():
     bpy.utils.unregister_class(Object_OT_generate_terrain)
-
-if __name__ == '__main__':
-    register()
+    bpy.utils.unregister_class(VIEW3D_PT_landscape_generator)
