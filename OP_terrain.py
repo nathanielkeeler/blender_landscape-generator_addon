@@ -1,30 +1,107 @@
 import bpy
 import random
 import typing
-from bpy.types import Nodes
 from mathutils import Vector
-import os
 
-class Terrain():
-    # Szene leeren
-    bpy.ops.object.select_all(action='SELECT') # selektiert alle Objekte
-    bpy.ops.object.delete(use_global=False, confirm=False) # löscht selektierte objekte
-    bpy.ops.outliner.orphans_purge() # löscht überbleibende Meshdaten etc.
+class Object_OT_generate_terrain(bpy.types.Operator):
+    """Landscape Generator"""
+    bl_idname = "mesh.generate_terrain"
+    bl_label = "generate_terrain"
+    bl_options = {'REGISTER', 'UNDO'}
 
-    # Delete world nodes
-    world_nodes = bpy.data.worlds['World'].node_tree
-    for currentNode in world_nodes.nodes:
-        world_nodes.nodes.remove(currentNode)
+
+    # Properties
+
+    terrain_size : bpy.props.IntProperty(
+        name='Terrain size',
+        description='Size of the terrain plane.',
+        default=25,
+        min=4,
+        soft_max=60
+    )
+
+    scale : bpy.props.FloatProperty(
+        name='Terrain density',
+        description='Scaling of the terrain texture density.',
+        default=random.uniform(1.5, 2.5),
+        min=0,
+        soft_min=1,
+        soft_max=10
+    )
+
+    distortion : bpy.props.FloatProperty(
+        name='Terrain distortion',
+        description='Amount of distortion for the terrain texture.',
+        default=random.uniform(0, 2),
+        min=0,
+        soft_max=4
+    )
+
+    detail : bpy.props.FloatProperty(
+        name='Terrain detail',
+        description='Amount of detail for the terrain texture.',
+        default=16,
+        min=0,
+        soft_max=16
+    )
+
+    detail_roughness : bpy.props.FloatProperty(
+        name='Terrain detail roughness',
+        description='Amount of roughness to details.',
+        default=0.3,
+        min=0,
+        soft_max=0.5
+    )
+
+    displace_scale : bpy.props.FloatProperty(
+        name='Terrain scale',
+        description='Scaling of the terrain height.',
+        default=random.uniform(1.5, 3),
+        min=0,
+        soft_max=4
+    )
+
+    random_noise : bpy.props.FloatProperty(
+        name='Randomness',
+        description='Amount of distortion for the terrain texture.',
+        default=1,
+        min=0
+    )
     
-    
-    def add_lighting(self):
+    color_ramp_black : bpy.props.FloatProperty(
+        name='Terrain steepness',
+        description='Amount of distortion for the terrain texture.',
+        default=random.uniform(0.3, 0.4),
+        soft_min=0.2,
+        soft_max=0.5
+    )
+
+    color_ramp_white : bpy.props.FloatProperty(
+        name='Terrain steepness',
+        description='Amount of distortion for the terrain texture.',
+        default=random.uniform(0.5, 0.6),
+        soft_min=0.5,
+        soft_max=0.7
+    )
+
+
+    def execute(self, context):
+
+        bpy.ops.outliner.orphans_purge()
+            # add light
         light_data = bpy.data.lights.new('light', type='SUN')
         light = bpy.data.objects.new('light', light_data)
         bpy.context.collection.objects.link(light)
         light.location = (10, -10, 7.5)
         light.data.energy = 1.5
 
-    def add_sky(self):
+        
+        # add HDR
+            # delete world nodes
+        world_nodes = bpy.data.worlds['World'].node_tree
+        for currentNode in world_nodes.nodes:
+            world_nodes.nodes.remove(currentNode)
+        
         world = bpy.data.worlds['World']
         world.use_nodes = True
 
@@ -37,16 +114,11 @@ class Terrain():
         node_background.location = Vector((0, 300))
         node_background.inputs[1].default_value = 0.1
 
-        # add HDRI image
+        bpy.ops.image.open(directory="//resources//hdr//",files=[{"name":"flower_road_2k.hdr", "name":"flower_road_2k.hdr"}], relative_path=True)
+
         node_env_tex: bpy.types.Node = nodes_world.new("ShaderNodeTexEnvironment")
         node_env_tex.location = Vector((-400, 300))
-        hdr_image: bpy.types.Image = bpy.data.images.load(
-            os.path.dirname(os.path.realpath(__file__)).replace(
-                'terrain.blend',
-                'resources\\hdr\\flower_road_2k.hdr'
-            )
-        )
-        node_env_tex.image = hdr_image
+        node_env_tex.image = bpy.data.images["flower_road_2k.hdr"]
         
         node_map: bpy.types.Node = nodes_world.new("ShaderNodeMapping")
         node_map.location = Vector((-700, 300))
@@ -69,11 +141,27 @@ class Terrain():
         world.cycles_visibility.transmission = True
         world.cycles_visibility.scatter = True
 
-    def generate_terrain(self):
+
+
+        # TERRAIN!
+
+        # Variables
+            # Terrain Form
+        # terrain_size = 25
+        # scale = random.uniform(1.5, 2.5)
+        # distortion = random.uniform(-1, 1)
+        # detail = 16
+        # detail_roughness = 0.3
+        # displace_scale = random.uniform(1.5, 3)
+        # random_noise = 1
+        # color_ramp_black = random.uniform(0.3, 0.4)
+        # color_ramp_white = random.uniform(0.5, 0.6)
+        
         bpy.context.scene.render.engine = 'CYCLES'
 
-        bpy.ops.mesh.primitive_plane_add(size=(20))
+        bpy.ops.mesh.primitive_plane_add(size=self.terrain_size)
         plane = bpy.context.object
+        plane.name="Landscape"
 
         mod_terrain = plane.modifiers.new("t_subsurf", "SUBSURF")
         mod_terrain.subdivision_type = 'SIMPLE'
@@ -88,17 +176,6 @@ class Terrain():
 
         mat_terrain.use_nodes = True
 
-        # Variables
-            # Terrain Form
-        scale = random.uniform(1.5, 2.5)
-        distortion = random.uniform(-1, 1)
-        detail = 7.5
-        detail_roughness = 0.3
-        displace_scale = random.uniform(1.5, 3)
-        random_noise = random.uniform(0.1, 1)
-        color_ramp_black = random.uniform(0.3, 0.4)
-        color_ramp_white = random.uniform(0.5, 0.6)
-
         # Nodes: Terrain Form
         nodes_terrain: typing.List[bpy.types.Node] = mat_terrain.node_tree.nodes
         
@@ -107,27 +184,27 @@ class Terrain():
             #
         node_terrain_displace: bpy.types.Node = nodes_terrain.new("ShaderNodeDisplacement")
         node_terrain_displace.location = Vector((130, 200))
-        node_terrain_displace.inputs[2].default_value = displace_scale
+        node_terrain_displace.inputs[2].default_value = self.displace_scale
 
             #
         node_color_ramp: bpy.types.Node = nodes_terrain.new("ShaderNodeValToRGB")
         node_color_ramp.location = Vector((-2400, 800))
         node_color_ramp.color_ramp.interpolation = 'EASE'
-        node_color_ramp.color_ramp.elements[0].position = color_ramp_black
-        node_color_ramp.color_ramp.elements[1].position = color_ramp_white
+        node_color_ramp.color_ramp.elements[0].position = self.color_ramp_black
+        node_color_ramp.color_ramp.elements[1].position = self.color_ramp_white
 
             #
         node_terrain_type: bpy.types.Node = nodes_terrain.new("ShaderNodeTexNoise")
         node_terrain_type.location = Vector((-2600, 800))
-        node_terrain_type.inputs[2].default_value = scale
-        node_terrain_type.inputs[3].default_value = detail
-        node_terrain_type.inputs[4].default_value = detail_roughness
-        node_terrain_type.inputs[5].default_value = distortion
+        node_terrain_type.inputs[2].default_value = self.scale
+        node_terrain_type.inputs[3].default_value = self.detail
+        node_terrain_type.inputs[4].default_value = self.detail_roughness
+        node_terrain_type.inputs[5].default_value = self.distortion
 
             #
         node_map: bpy.types.Node = nodes_terrain.new("ShaderNodeMapping")
         node_map.location = Vector((-2800, 800))
-        node_map.inputs[1].default_value[1] = random_noise
+        node_map.inputs[1].default_value[1] = self.random_noise
 
             #
         node_tex_coord: bpy.types.Node = nodes_terrain.new("ShaderNodeTexCoord")
@@ -144,11 +221,6 @@ class Terrain():
         mat_terrain.node_tree.links.new(node_map.outputs[0], node_terrain_type.inputs[0])
         mat_terrain.node_tree.links.new(node_tex_coord.outputs[0], node_map.inputs[0])
         mat_terrain.node_tree.links.new(node_pbsdf.outputs[0], node_output.inputs[0])
-
-        
-
-        # Variables
-            # Textures
 
 
         # Nodes: Texture (Water)
@@ -185,6 +257,8 @@ class Terrain():
         node_water_gloss: bpy.types.Node = nodes_terrain.new("ShaderNodeBsdfGlossy")
         node_water_gloss.location = Vector((-600, 1200))
         node_water_gloss.inputs[1].default_value = 0.045
+        node_water_gloss.inputs[0].default_value = (0.236871, 0.292942, 0.504464, 1)
+
 
             # Mix Shader
         node_mix_shader: bpy.types.Node = nodes_terrain.new("ShaderNodeMixShader")
@@ -196,16 +270,13 @@ class Terrain():
         mat_terrain.node_tree.links.new(node_mix_shader.outputs[0], node_output.inputs[0])
         
 
-        # Nodes: Texture (Rock)  
-            # Rock Texture Nude
+        # Nodes: Texture (Rock)
+            # load images for rock
+        bpy.ops.image.open(directory="//resources//textures//rock//",files=[{"name":"TexturesCom_Rock_Cliff3_2x2_512_albedo.tif", "name":"TexturesCom_Rock_Cliff3_2x2_512_albedo.tif"}, {"name":"TexturesCom_Rock_Cliff3_2x2_512_roughness.tif", "name":"TexturesCom_Rock_Cliff3_2x2_512_roughness.tif"}, {"name":"TexturesCom_Rock_Cliff3_2x2_512_normal.tif", "name":"TexturesCom_Rock_Cliff3_2x2_512_normal.tif"}], relative_path=True)
+            
+            # Rock Texture Node
         node_rock_tex: bpy.types.Node = nodes_terrain.new("ShaderNodeTexImage")
-        image_rock: bpy.types.Image = bpy.data.images.load(
-            os.path.dirname(os.path.realpath(__file__)).replace(
-                'terrain.blend',
-                'resources\\textures\\rock\\TexturesCom_Rock_Cliff3_2x2_512_albedo.tif'
-            )
-        )
-        node_rock_tex.image = image_rock
+        node_rock_tex.image = bpy.data.images["TexturesCom_Rock_Cliff3_2x2_512_albedo.tif"]
         node_rock_tex.location = Vector((-1800, -350))
 
             # mix_rgb node
@@ -218,14 +289,8 @@ class Terrain():
 
             # add rock roughness texture node
         node_rock_roughness_tex: bpy.types.Node = nodes_terrain.new("ShaderNodeTexImage")
-        image_rock_roughness: bpy.types.Image = bpy.data.images.load(
-            os.path.dirname(os.path.realpath(__file__)).replace(
-                'terrain.blend',
-                'resources\\textures\\rock\\TexturesCom_Rock_Cliff3_2x2_512_roughness.tif'
-            )
-        )
-        image_rock_roughness.colorspace_settings.name = 'Non-Color'
-        node_rock_roughness_tex.image = image_rock_roughness
+        node_rock_roughness_tex.image = bpy.data.images["TexturesCom_Rock_Cliff3_2x2_512_roughness.tif"]
+        node_rock_roughness_tex.image.colorspace_settings.name = 'Non-Color'
         node_rock_roughness_tex.location = Vector((-1800, -900))
 
             # mix_rgb node
@@ -238,14 +303,8 @@ class Terrain():
 
             # add rock normal map texture node
         node_rock_normal_tex: bpy.types.Node = nodes_terrain.new("ShaderNodeTexImage")
-        image_rock_normal: bpy.types.Image = bpy.data.images.load(
-            os.path.dirname(os.path.realpath(__file__)).replace(
-                'terrain.blend',
-                'resources\\textures\\rock\\TexturesCom_Rock_Cliff3_2x2_512_normal.tif'
-            )
-        )
-        image_rock_normal.colorspace_settings.name = 'Non-Color'
-        node_rock_normal_tex.image = image_rock_normal
+        node_rock_normal_tex.image = bpy.data.images["TexturesCom_Rock_Cliff3_2x2_512_normal.tif"]
+        node_rock_normal_tex.image.colorspace_settings.name = 'Non-Color'
         node_rock_normal_tex.location = Vector((-1800, -1500))
 
             # mix_rgb node
@@ -277,15 +336,12 @@ class Terrain():
 
 
         # Nodes: Texture (Moss)
+            # load textures
+        bpy.ops.image.open(directory="//resources//textures//moss//",files=[{"name":"TexturesCom_Nature_Moss_512_albedo.tif", "name":"TexturesCom_Nature_Moss_512_albedo.tif"}, {"name":"TexturesCom_Nature_Moss_512_roughness.tif", "name":"TexturesCom_Nature_Moss_512_roughness.tif"}, {"name":"TexturesCom_Nature_Moss_512_normal.tif", "name":"TexturesCom_Nature_Moss_512_normal.tif"}], relative_path=True)
+
             # add moss texture node
         node_moss_tex: bpy.types.Node = nodes_terrain.new("ShaderNodeTexImage")
-        image_moss: bpy.types.Image = bpy.data.images.load(
-            os.path.dirname(os.path.realpath(__file__)).replace(
-                'terrain.blend',
-                'resources\\textures\\moss\\TexturesCom_Nature_Moss_512_albedo.tif'
-            )
-        )
-        node_moss_tex.image = image_moss
+        node_moss_tex.image = bpy.data.images["TexturesCom_Nature_Moss_512_albedo.tif"]
         node_moss_tex.location = Vector((-1800, -630))
 
             # connect map node to texture to mix rgb
@@ -294,14 +350,8 @@ class Terrain():
 
             # add moss roughness texture node
         node_moss_roughness_tex: bpy.types.Node = nodes_terrain.new("ShaderNodeTexImage")
-        image_moss_roughness: bpy.types.Image = bpy.data.images.load(
-            os.path.dirname(os.path.realpath(__file__)).replace(
-                'terrain.blend',
-                'resources\\textures\\moss\\TexturesCom_Nature_Moss_512_roughness.tif'
-            )
-        )
-        image_moss_roughness.colorspace_settings.name = 'Non-Color'
-        node_moss_roughness_tex.image = image_moss_roughness
+        node_moss_roughness_tex.image = bpy.data.images["TexturesCom_Nature_Moss_512_roughness.tif"]
+        node_moss_roughness_tex.image.colorspace_settings.name = 'Non-Color'
         node_moss_roughness_tex.location = Vector((-1800, -1200))
             
             # connect map node to normal texture to mix rgb
@@ -311,14 +361,8 @@ class Terrain():
 
             # add moss normal_map texture node
         node_moss_normal_tex: bpy.types.Node = nodes_terrain.new("ShaderNodeTexImage")
-        image_moss_normal: bpy.types.Image = bpy.data.images.load(
-            os.path.dirname(os.path.realpath(__file__)).replace(
-                'terrain.blend',
-                'resources\\textures\\moss\\TexturesCom_Nature_Moss_512_normal.tif'
-            )
-        )
-        image_moss_normal.colorspace_settings.name = 'Non-Color'
-        node_moss_normal_tex.image = image_moss_normal
+        node_moss_normal_tex.image = bpy.data.images["TexturesCom_Nature_Moss_512_normal.tif"]
+        node_moss_normal_tex.image.colorspace_settings.name = 'Non-Color'
         node_moss_normal_tex.location = Vector((-1800, -1800))
             
             # connect map node to normal texture to mix rgb
@@ -350,15 +394,13 @@ class Terrain():
 
 
         # Nodes: Texture (Sand)
+
+            # load textures
+        bpy.ops.image.open(directory="//resources//textures//sand//",files=[{"name":"TexturesCom_Ground_SandDesert1_3x3_512_albedo.tif", "name":"TexturesCom_Ground_SandDesert1_3x3_512_albedo.tif"}, {"name":"TexturesCom_Ground_SandDesert1_3x3_512_roughness.tif", "name":"TexturesCom_Ground_SandDesert1_3x3_512_roughness.tif"}, {"name":"TexturesCom_Ground_SandDesert1_3x3_512_normal.tif", "name":"TexturesCom_Ground_SandDesert1_3x3_512_normal.tif"}], relative_path=True)
+
             # add sand texture node
         node_sand_tex: bpy.types.Node = nodes_terrain.new("ShaderNodeTexImage")
-        image_sand: bpy.types.Image = bpy.data.images.load(
-            os.path.dirname(os.path.realpath(__file__)).replace(
-                'terrain.blend',
-                'resources\\textures\\sand\\TexturesCom_Ground_SandDesert1_3x3_512_albedo.tif'
-            )
-        )
-        node_sand_tex.image = image_sand
+        node_sand_tex.image = bpy.data.images["TexturesCom_Ground_SandDesert1_3x3_512_albedo.tif"]
         node_sand_tex.location = Vector((-1250, -400))
 
             # mix_rgb node
@@ -372,14 +414,8 @@ class Terrain():
 
             # add sand roughness_map texture node
         node_sand_roughness_tex: bpy.types.Node = nodes_terrain.new("ShaderNodeTexImage")
-        image_sand_roughness: bpy.types.Image = bpy.data.images.load(
-            os.path.dirname(os.path.realpath(__file__)).replace(
-                'terrain.blend',
-                'resources\\textures\\sand\\TexturesCom_Ground_SandDesert1_3x3_512_roughness.tif'
-            )
-        )
-        image_sand_roughness.colorspace_settings.name = 'Non-Color'
-        node_sand_roughness_tex.image = image_sand_roughness
+        node_sand_roughness_tex.image = bpy.data.images["TexturesCom_Ground_SandDesert1_3x3_512_roughness.tif"]
+        node_sand_roughness_tex.image.colorspace_settings.name = 'Non-Color'
         node_sand_roughness_tex.location = Vector((-1250, -900))
 
             # mix_rgb node
@@ -392,14 +428,8 @@ class Terrain():
 
             # add sand normal_map texture node
         node_sand_normal_tex: bpy.types.Node = nodes_terrain.new("ShaderNodeTexImage")
-        image_sand_normal: bpy.types.Image = bpy.data.images.load(
-            os.path.dirname(os.path.realpath(__file__)).replace(
-                'terrain.blend',
-                'resources\\textures\\sand\\TexturesCom_Ground_SandDesert1_3x3_512_normal.tif'
-            )
-        )
-        image_sand_normal.colorspace_settings.name = 'Non-Color'
-        node_sand_normal_tex.image = image_sand_normal
+        node_sand_normal_tex.image = bpy.data.images["TexturesCom_Ground_SandDesert1_3x3_512_normal.tif"]
+        node_sand_normal_tex.image.colorspace_settings.name = 'Non-Color'
         node_sand_normal_tex.location = Vector((-1250, -1300))
 
             # mix_rgb node
@@ -495,10 +525,36 @@ class Terrain():
 
         # Append Material to Plane
         plane.data.materials.append(mat_terrain)
-            
 
 
-t = Terrain()    
-t.generate_terrain()
-t.add_lighting()
-t.add_sky()
+        return {'FINISHED'}
+
+class VIEW3D_PT_landscape_generator(bpy.types.Panel):
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'UI'
+    bl_category = "Landscape Gen"
+    bl_label = "Properties"
+
+    def draw(self,context):
+        self.layout.operator(
+            'mesh.generate_terrain', text='Generate Landscape', icon='OUTLINER_OB_IMAGE'
+        )
+
+def mesh_add_menu_draw(self, context):
+    self.layout.operator(
+        'mesh.generate_terrain', text='Generate Landscape', icon='OUTLINER_OB_IMAGE'
+    )
+
+
+def register():
+    bpy.utils.register_class(Object_OT_generate_terrain)
+    bpy.utils.register_class(VIEW3D_PT_landscape_generator)
+    bpy.types.VIEW3D_MT_mesh_add.append(mesh_add_menu_draw)
+
+def unregister():
+    bpy.utils.unregister_class(Object_OT_generate_terrain)
+    bpy.utils.unregister_class(VIEW3D_PT_landscape_generator)
+    bpy.types.VIEW3D_MT_mesh_add.remove(mesh_add_menu_draw)
+
+if __name__ == '__main__':
+    register()
