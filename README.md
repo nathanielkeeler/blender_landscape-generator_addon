@@ -1,1 +1,1 @@
-# Blender Addon: Landschaftsgenerator
+# Blender Addon: Landscape generator
